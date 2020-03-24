@@ -17,7 +17,7 @@ struct Process
 	long waiting_time=0;                              //Waiting_Time=Turn_Around_Time-Burst_Time
     long response_time=0;                             //RT=CPU got Process first time-Arrival Time
 	long remaining_time=0;                            //Time For Which Process Is Remaining to be Executed  
-    long CPUtime=-1;                                  //Stores When Process got CPU for first time
+    bool CPUtime=false;                                  //Stores When Process got CPU for first time
 };
 
 vector<long> ready_queue;
@@ -98,9 +98,29 @@ int main(){
 	long time=mintime;
 	while(!ready_queue.empty() && time<=total_time){
 		long cur=ready_queue[0];
+		if(p[cur].CPUtime==false){
+		
 		if(time%6==0){
 			cout<<"6 mins"<<endl;
-		}else if(time%10==0){
+		}else{
+			if(p[cur].response_time==0 && p[cur].arrival_time!=time){
+				p[cur].response_time=time-p[cur].arrival_time;
+			}
+			if(p[cur].remaining_time==0){
+				p[cur].completion_time=time;
+				p[cur].turnaround_time=p[cur].completion_time-p[cur].arrival_time;
+				p[cur].waiting_time=p[cur].turnaround_time-p[cur].burst_time;
+				ready_queue.erase(ready_queue.begin());
+			}else{
+				p[cur].remaining_time-=1;
+				
+			}
+		}
+		
+		p[cur].CPUtime=true;
+		}else{
+			
+			if(time%10==0){
 			cout<<"10 mins"<<endl;
 		}else{
 			if(p[cur].response_time==0 && p[cur].arrival_time!=time){
@@ -115,6 +135,9 @@ int main(){
 				p[cur].remaining_time-=1;
 				
 			}
+		}
+		
+		
 		}
 		display_table(p,n);
 		time+=1;
