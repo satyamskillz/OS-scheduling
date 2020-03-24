@@ -21,13 +21,14 @@ struct Process
 
 vector<long> ready_queue;
 vector<long> waiting_queue;
-bool comparison_Priority(Process a, Process b)        //Driver Function-Sorting According to Priority
-{ 
-    return (a.priority < b.priority); 
-}
+vector<long> completed_process;
 bool comparison_ArrivalTime(Process a,Process b)      //Driver Function-Sorting According to Arrival Time(Acending Order)
 {
     return (a.arrival_time < b.arrival_time);
+}
+bool comparison_BurstTime(Process a,Process b)      //Driver Function-Sorting According to Arrival Time(Acending Order)
+{
+    return (a.Burst_Time < b.Burst_Time);
 }
 bool comparison_PID(Process a,Process b)              //Driver Function-Sorting According to PID(Acending Order)
 {
@@ -59,12 +60,14 @@ int main(){
 	}
 	Process p[n];
 	for(long i=0;i<n;i++){
-		p[i].pid=i;
-		cout<<"Enter Arrival time of "<<i<<endl;
+		p[i].pid=i+1;
+		cout<<"Prcess-"<<p[i].pid<<endl;
+		cout<<"Enter Arrival time:"<<i<<endl;
 		cin>>p[i].arrival_time;
-		cout<<"Enter burst time of "<<i<<endl;
+		cout<<"Enter burst time: "<<i<<endl;
 		cin>>p[i].burst_time;
 		p[i].remaining_time=p[i].burst_time;	
 	}
 	display_table(p,n);
+
 }
