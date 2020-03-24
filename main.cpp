@@ -42,10 +42,10 @@ bool comparison_RemainingTime(Process a,Process b)    //Driver Function-Sorting 
 
 long display_table(Process p[],long n)
 {
-    cout<<"\nPID || Arrival Time || Burst Time || Completion Time || TurnAround Time || Waiting Time\n";
+    cout<<"\nPID || Arrival Time || Burst Time || Completion Time || TurnAround Time || Waiting Time || Remaining time ||\n";
     for(long i=0;i<n;i++)
     {
-        cout<<p[i].pid<<"\t\t"<<p[i].arrival_time<<"\t\t"<<p[i].burst_time<<"\t\t"<<p[i].completion_time<<"\t\t"<<p[i].turnaround_time<<"\t\t"<<p[i].waiting_time<<"\n";
+        cout<<p[i].pid<<"\t\t"<<p[i].arrival_time<<"\t\t"<<p[i].burst_time<<"\t\t"<<p[i].completion_time<<"\t\t"<<p[i].turnaround_time<<"\t\t"<<p[i].waiting_time<<"\t\t"<<p[i].remaining_time<<"\n";
     }    
     return 0; 
 }
@@ -62,6 +62,9 @@ long memory_to_ready(Process p[],long n,bool call=false){
 				   }
 	}
 }
+long ready_to_waiting(long cur){
+	waiting_queue.push_back(cur);
+}
 
 int main(){
 	long n;
@@ -74,7 +77,7 @@ int main(){
 	}
 	Process p[n];
 	for(long i=0;i<n;i++){
-		p[i].pid=i+1;
+		p[i].pid=i;
 		cout<<"Prcess: "<<p[i].pid<<endl;
 		cout<<"Enter Arrival time: ";
 		cin>>p[i].arrival_time;
@@ -96,49 +99,52 @@ int main(){
 	memory_to_ready(p,n,call=true);
 	
 	long time=mintime;
-	while(!ready_queue.empty() && time<=total_time){
+	long off=0;
+	while(!ready_queue.empty() || time<=total_time){
 		long cur=ready_queue[0];
 		if(p[cur].CPUtime==false){
 		
-		if(time%6==0){
+		if(time%6==0 && time!=0){
 			cout<<"6 mins"<<endl;
+//			ready_to_waiting(cur);
+			off+=1;
 		}else{
 			if(p[cur].response_time==0 && p[cur].arrival_time!=time){
 				p[cur].response_time=time-p[cur].arrival_time;
 			}
 			if(p[cur].remaining_time==0){
-				p[cur].completion_time=time;
+				time=time-off;
+			    p[cur].completion_time=time;
 				p[cur].turnaround_time=p[cur].completion_time-p[cur].arrival_time;
 				p[cur].waiting_time=p[cur].turnaround_time-p[cur].burst_time;
 				ready_queue.erase(ready_queue.begin());
+				cout<<"Number of time breaking took place: "<<off<<endl;
+				off=0;
 			}else{
 				p[cur].remaining_time-=1;
-				
 			}
 		}
-		
 		p[cur].CPUtime=true;
 		}else{
-			
-			if(time%10==0){
-			cout<<"10 mins"<<endl;
-		}else{
-			if(p[cur].response_time==0 && p[cur].arrival_time!=time){
-				p[cur].response_time=time-p[cur].arrival_time;
-			}
-			if(p[cur].remaining_time==0){
-				p[cur].completion_time=time;
-				p[cur].turnaround_time=p[cur].completion_time-p[cur].arrival_time;
-				p[cur].waiting_time=p[cur].turnaround_time-p[cur].burst_time;
-				ready_queue.erase(ready_queue.begin());
-			}else{
-				p[cur].remaining_time-=1;
-				
-			}
+			  if(time%10==0 && time!=0)
+			  {
+			   cout<<"10 mins"<<endl;
+			   off+=1;
+			   }else{
+					if(p[cur].remaining_time==0){
+						time=time-off;
+					 	p[cur].completion_time=time;
+			 			p[cur].turnaround_time=p[cur].completion_time-p[cur].arrival_time;
+			 			p[cur].waiting_time=p[cur].turnaround_time-p[cur].burst_time;
+			 			ready_queue.erase(ready_queue.begin());
+			 			cout<<"Number of time breaking took place: "<<off<<endl;
+			 			off=0;
+ 			 		}else{
+	 	   		 	   	p[cur].remaining_time-=1;
+	 		 		}
+	 		 	}
 		}
-		
-		
-		}
+		cout<<"time: "<<time<<endl;
 		display_table(p,n);
 		time+=1;
 	}
