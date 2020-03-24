@@ -14,7 +14,7 @@ user.
 <h2>
 Consider the following units for reference.</h2>
 <table>
-<tr style="background-color: black; color: aliceblue">
+<tr>
 <th>process</th>
 <th> Arrival time</th>
 <th>Brust Time</th>
@@ -45,5 +45,4 @@ Develop a scheduler which submits the processes to the processor in the defined 
 compute the scheduler performance by providing the waiting time for process, turnaround time
 for process and average waiting time and turnaround time.
 </h5>
-
 <img src="Woking-program.png">
