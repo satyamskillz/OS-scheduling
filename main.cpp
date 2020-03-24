@@ -1,6 +1,6 @@
 #include<bits/stdc++.h>
 #include<iostream>
-#include<windows.h>                                    //Sleep() function
+#include<windows.h>
 using namespace std;
 
 long maxtime=-1,mintime=INT_MAX;
@@ -9,7 +9,6 @@ long total_time=0;
 struct Process
 {
     long pid=0;                                       //Process ID
-    long priority=0;                                 //the Priority 0 is highest priority
     long arrival_time=0;                              //Time At Which Process Came
 	long burst_time=0;                                //The Total Time for which process should run
     long completion_time=0;                           //Time at which CPU completed the whole process
@@ -17,7 +16,7 @@ struct Process
 	long waiting_time=0;                              //Waiting_Time=Turn_Around_Time-Burst_Time
     long response_time=0;                             //RT=CPU got Process first time-Arrival Time
 	long remaining_time=0;                            //Time For Which Process Is Remaining to be Executed  
-    bool CPUtime=false;                                  //Stores When Process got CPU for first time
+    bool CPUtime=false;                               //Stores When Process got CPU for first time
 };
 
 vector<long> ready_queue;
@@ -62,10 +61,21 @@ long memory_to_ready(Process p[],long n,bool call=false){
 				   }
 	}
 }
-long ready_to_waiting(long cur){
-	waiting_queue.push_back(cur);
+long ready_to_waiting(Process p[],long cur){
+	if(waiting_queue.empty()){
+		waiting_queue.push_back(cur);
+	}else{
+		if(p[cur].remaining_time>=p[waiting_queue[0]].remaining_time){
+			waiting_queue.push_back(waiting_queue[0]);
+			waiting_queue[0]=cur;
+		}
+	}
+	ready_queue.erase(ready_queue.begin());
 }
-
+long waiting_to_ready(){
+	ready_queue.push_back(waiting_queue[0]);
+	waiting_queue.erase(waiting_queue.begin());
+}
 int main(){
 	long n;
 	cout<<"Enter number of processes:";
@@ -95,8 +105,8 @@ int main(){
     	}
 	}
 	total_time+=mintime;
-	bool call;
-	memory_to_ready(p,n,call=true);
+	
+	memory_to_ready(p,n);
 	
 	long time=mintime;
 	long off=0;
@@ -105,8 +115,8 @@ int main(){
 		if(p[cur].CPUtime==false){
 		
 		if(time%6==0 && time!=0){
-			cout<<"6 mins"<<endl;
-//			ready_to_waiting(cur);
+			ready_to_waiting(p,cur);
+			waiting_to_ready();
 			off+=1;
 		}else{
 			if(p[cur].response_time==0 && p[cur].arrival_time!=time){
@@ -118,7 +128,6 @@ int main(){
 				p[cur].turnaround_time=p[cur].completion_time-p[cur].arrival_time;
 				p[cur].waiting_time=p[cur].turnaround_time-p[cur].burst_time;
 				ready_queue.erase(ready_queue.begin());
-				cout<<"Number of time breaking took place: "<<off<<endl;
 				off=0;
 			}else{
 				p[cur].remaining_time-=1;
@@ -128,7 +137,8 @@ int main(){
 		}else{
 			  if(time%10==0 && time!=0)
 			  {
-			   cout<<"10 mins"<<endl;
+			   ready_to_waiting(p,cur);
+			   waiting_to_ready();
 			   off+=1;
 			   }else{
 					if(p[cur].remaining_time==0){
@@ -137,15 +147,23 @@ int main(){
 			 			p[cur].turnaround_time=p[cur].completion_time-p[cur].arrival_time;
 			 			p[cur].waiting_time=p[cur].turnaround_time-p[cur].burst_time;
 			 			ready_queue.erase(ready_queue.begin());
-			 			cout<<"Number of time breaking took place: "<<off<<endl;
 			 			off=0;
  			 		}else{
 	 	   		 	   	p[cur].remaining_time-=1;
 	 		 		}
 	 		 	}
 		}
-		cout<<"time: "<<time<<endl;
-		display_table(p,n);
 		time+=1;
 	}
+	cout<<"time taken to complete process: "<<time-4<<endl;
+	display_table(p,n);
+	long sum_WT=0, sum_TT=0;
+	for(int i=0;i<n;i++){
+		sum_WT+=p[i].waiting_time;
+		sum_TT+=p[i].turnaround_time;
+	}
+	cout<<"+++++++++++++++++++++++++++++++"<<endl;
+	cout<<"Average Waiting Time:"<<sum_WT/n<<endl;
+	cout<<"Average Turnaround Time:"<<sum_TT/n<<endl;
+	cout<<"+++++++++++++++++++++++++++++++"<<endl;
 }
