@@ -13,7 +13,7 @@ user.
 </h5>
 <h2>
 Consider the following units for reference.</h2>
-<table border="1px">
+<table>
 <tr style="background-color: black; color: aliceblue">
 <th>process</th>
 <th> Arrival time</th>
