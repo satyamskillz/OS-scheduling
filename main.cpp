@@ -4,6 +4,7 @@
 using namespace std;
 
 long maxtime=-1,mintime=INT_MAX;
+long total_time=0;
 
 struct Process
 {
@@ -26,9 +27,9 @@ bool comparison_ArrivalTime(Process a,Process b)      //Driver Function-Sorting 
 {
     return (a.arrival_time < b.arrival_time);
 }
-bool comparison_BurstTime(Process a,Process b)      //Driver Function-Sorting According to Arrival Time(Acending Order)
+bool comparison_BurstTime(Process a,Process b)        //Driver Function-Sorting According to Arrival Time(Acending Order)
 {
-    return (a.Burst_Time < b.Burst_Time);
+    return (a.burst_time >= b.burst_time);
 }
 bool comparison_PID(Process a,Process b)              //Driver Function-Sorting According to PID(Acending Order)
 {
@@ -49,6 +50,19 @@ long display_table(Process p[],long n)
     return 0; 
 }
 
+long memory_to_ready(Process p[],long n,bool call=false){
+	sort(p,p+n,comparison_ArrivalTime);
+	display_table(p,n);
+	for(int i=0;i<n;i++){
+		ready_queue.push_back(p[i].pid);
+	}
+	if(call==true){
+				   for(int i=0;i<n;i++){
+				   cout<<ready_queue[i]<<endl;
+				   }
+	}
+}
+
 int main(){
 	long n;
 	cout<<"Enter number of processes:";
@@ -61,13 +75,48 @@ int main(){
 	Process p[n];
 	for(long i=0;i<n;i++){
 		p[i].pid=i+1;
-		cout<<"Prcess-"<<p[i].pid<<endl;
-		cout<<"Enter Arrival time:"<<i<<endl;
+		cout<<"Prcess: "<<p[i].pid<<endl;
+		cout<<"Enter Arrival time: ";
 		cin>>p[i].arrival_time;
-		cout<<"Enter burst time: "<<i<<endl;
+		cout<<"Enter burst time: ";
 		cin>>p[i].burst_time;
-		p[i].remaining_time=p[i].burst_time;	
+		total_time=total_time+p[i].burst_time;
+		p[i].remaining_time=p[i].burst_time;
+		cout<<"================================="<<endl;
+		
+		if(p[i].arrival_time<mintime){
+ 		mintime=p[i].arrival_time;
+		}
+    	if(p[i].arrival_time>maxtime){
+  		maxtime=p[i].arrival_time;          
+    	}
 	}
-	display_table(p,n);
-
+	total_time+=mintime;
+	bool call;
+	memory_to_ready(p,n,call=true);
+	
+	long time=mintime;
+	while(!ready_queue.empty() && time<=total_time){
+		long cur=ready_queue[0];
+		if(time%6==0){
+			cout<<"6 mins"<<endl;
+		}else if(time%10==0){
+			cout<<"10 mins"<<endl;
+		}else{
+			if(p[cur].response_time==0 && p[cur].arrival_time!=time){
+				p[cur].response_time=time-p[cur].arrival_time;
+			}
+			if(p[cur].remaining_time==0){
+				p[cur].completion_time=time;
+				p[cur].turnaround_time=p[cur].completion_time-p[cur].arrival_time;
+				p[cur].waiting_time=p[cur].turnaround_time-p[cur].burst_time;
+				ready_queue.erase(ready_queue.begin());
+			}else{
+				p[cur].remaining_time-=1;
+				
+			}
+		}
+		display_table(p,n);
+		time+=1;
+	}
 }
