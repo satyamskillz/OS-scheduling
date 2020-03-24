@@ -40,7 +40,7 @@ bool comparison_RemainingTime(Process a,Process b)    //Driver Function-Sorting 
 
 long display_table(Process p[],long n)
 {
-    cout<<"\nPID || Arrival Time || Burst Time || Completion Time || TurnAround Time || Waiting Time || Response Time\n";
+    cout<<"\nPID || Arrival Time || Burst Time || Completion Time || TurnAround Time || Waiting Time\n";
     for(long i=0;i<n;i++)
     {
         cout<<p[i].pid<<"\t\t"<<p[i].arrival_time<<"\t\t"<<p[i].burst_time<<"\t\t"<<p[i].completion_time<<"\t\t"<<p[i].turnaround_time<<"\t\t"<<p[i].waiting_time<<"\n";
@@ -67,5 +67,4 @@ int main(){
 		p[i].remaining_time=p[i].burst_time;	
 	}
 	display_table(p,n);
-
 }
